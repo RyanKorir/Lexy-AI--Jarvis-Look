@@ -1,0 +1,7 @@
+{
+  "name": "LEXY AI - Jarvis-Grade Assistant",
+  "description": "A futuristic, sarcastic, and highly efficient digital assistant inspired by JARVIS, built with Gemini 3 for tool-calling and real-time reasoning.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
