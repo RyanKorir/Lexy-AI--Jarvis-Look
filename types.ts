@@ -18,6 +18,7 @@ export interface LexySettings {
   coreIntensity: number;
   userName: string;
   memoryNodes: string[]; // Summarized past contexts
+  customAvatarUrl: string | null; // New field for custom avatar image
 }
 
 export interface SystemStatus {

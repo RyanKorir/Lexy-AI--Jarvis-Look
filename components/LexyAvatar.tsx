@@ -9,6 +9,7 @@ interface Props {
   speed: number;
   intensity: number;
   onClick: () => void;
+  customAvatarUrl: string | null; // New prop for custom avatar
 }
 
 const themeColors = {
@@ -32,19 +33,23 @@ const borderColors = {
   gold: 'border-amber-400/30',
 };
 
-export const LexyAvatar: React.FC<Props> = ({ isThinking, isListening, theme, speed, intensity, onClick }) => {
+export const LexyAvatar: React.FC<Props> = ({ isThinking, isListening, theme, speed, intensity, onClick, customAvatarUrl }) => {
   const [isBlinking, setIsBlinking] = useState(false);
 
   // Random blink logic
   useEffect(() => {
-    const triggerBlink = () => {
-      setIsBlinking(true);
-      setTimeout(() => setIsBlinking(false), 150);
-      setTimeout(triggerBlink, Math.random() * 5000 + 2000);
-    };
-    const timeout = setTimeout(triggerBlink, 3000);
-    return () => clearTimeout(timeout);
-  }, []);
+    // Only blink if not using a custom avatar
+    if (!customAvatarUrl) {
+      const triggerBlink = () => {
+        setIsBlinking(true);
+        setTimeout(() => setIsBlinking(false), 150);
+        setTimeout(triggerBlink, Math.random() * 5000 + 2000);
+      };
+      const timeout = setTimeout(triggerBlink, 3000);
+      return () => clearTimeout(timeout);
+    }
+    return () => {}; // No-op cleanup if custom avatar is used
+  }, [customAvatarUrl]);
 
   const rotationStyle = { animationDuration: `${20 / speed}s` };
 
@@ -58,28 +63,34 @@ export const LexyAvatar: React.FC<Props> = ({ isThinking, isListening, theme, sp
           className={`absolute inset-0 border border-dashed ${borderColors[theme].replace('/30', '/20')} rounded-full animate-[spin_linear_infinite]`} 
         />
 
-        {/* The Eye Socket */}
+        {/* The Eye Socket / Custom Avatar Container */}
         <div 
           className={`absolute inset-4 rounded-full bg-slate-950 border-2 ${borderColors[theme]} shadow-inner overflow-hidden flex items-center justify-center transition-all duration-300 ${isListening ? 'border-opacity-100 ring-4 ring-white/10' : ''}`}
           style={{ boxShadow: (isThinking || isListening) ? `0 0 ${40 * intensity}px ${glowColors[theme]}` : 'none' }}
         >
-          {/* Eyelids (Blink Effect) */}
-          <div className={`absolute inset-0 bg-slate-900 z-30 transition-all duration-150 ${isBlinking ? 'h-full' : 'h-0'}`} />
+          {customAvatarUrl ? (
+            <img src={customAvatarUrl} alt="Custom Avatar" className="w-full h-full object-cover rounded-full" />
+          ) : (
+            <>
+              {/* Eyelids (Blink Effect) */}
+              <div className={`absolute inset-0 bg-slate-900 z-30 transition-all duration-150 ${isBlinking ? 'h-full' : 'h-0'}`} />
 
-          {/* Iris Container */}
-          <div className={`relative w-4/5 h-4/5 rounded-full border border-white/5 flex items-center justify-center transition-transform duration-500 ${isThinking ? 'animate-pulse' : ''} ${isListening ? 'scale-110' : ''}`}>
-            
-            {/* Pupil */}
-            <div className={`relative z-20 w-1/3 h-1/3 rounded-full bg-gradient-to-br ${themeColors[theme]} shadow-2xl flex items-center justify-center`}>
-              {/* Inner Pupil Glow */}
-              <div className="w-1/2 h-1/2 rounded-full bg-white opacity-40 blur-[2px]" />
-            </div>
+              {/* Iris Container */}
+              <div className={`relative w-4/5 h-4/5 rounded-full border border-white/5 flex items-center justify-center transition-transform duration-500 ${isThinking ? 'animate-pulse' : ''} ${isListening ? 'scale-110' : ''}`}>
+                
+                {/* Pupil */}
+                <div className={`relative z-20 w-1/3 h-1/3 rounded-full bg-gradient-to-br ${themeColors[theme]} shadow-2xl flex items-center justify-center`}>
+                  {/* Inner Pupil Glow */}
+                  <div className="w-1/2 h-1/2 rounded-full bg-white opacity-40 blur-[2px]" />
+                </div>
 
-            {/* Shimmering Rings (Iris Details) */}
-            <div className={`absolute inset-0 rounded-full border-2 border-white/10 ${isListening ? 'animate-ping' : ''}`} />
-            <div className="absolute inset-2 rounded-full border border-white/5 animate-[spin_10s_linear_infinite]" />
-            <div className="absolute inset-4 rounded-full border border-white/5 animate-[spin_15s_linear_infinite_reverse]" />
-          </div>
+                {/* Shimmering Rings (Iris Details) */}
+                <div className={`absolute inset-0 rounded-full border-2 border-white/10 ${isListening ? 'animate-ping' : ''}`} />
+                <div className="absolute inset-2 rounded-full border border-white/5 animate-[spin_10s_linear_infinite]" />
+                <div className="absolute inset-4 rounded-full border border-white/5 animate-[spin_15s_linear_infinite_reverse]" />
+              </div>
+            </>
+          )}
         </div>
 
         {/* Listening / Thinking Text HUD */}

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Volume2, VolumeX, Palette, Zap, User, Fingerprint, Shield } from 'lucide-react';
+import { X, Volume2, VolumeX, Palette, Zap, User, Fingerprint, Shield, Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { LexySettings, ThemeType } from '../types';
 
 interface Props {
@@ -27,6 +27,23 @@ export const SettingsPanel: React.FC<Props> = ({ settings, onUpdate, onClose }) 
         ? 'text-cyan-400 border-b-2 border-cyan-400' 
         : 'text-slate-500 hover:text-white border-b-2 border-transparent hover:border-white/10'
     }`;
+
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Basic file size check (1MB)
+      if (file.size > 1024 * 1024) {
+        alert("File is too large! Max 1MB.");
+        event.target.value = ''; // Clear the input
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onUpdate({ customAvatarUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
@@ -92,6 +109,42 @@ export const SettingsPanel: React.FC<Props> = ({ settings, onUpdate, onClose }) 
                 </div>
                 <p className="text-[9px] text-slate-500 mono leading-relaxed mt-2">
                   Selecting a new aesthetic matrix will initiate a "Protocol Shift" sequence.
+                </p>
+              </div>
+
+              {/* Avatar Upload */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 text-[10px] mono text-slate-400 uppercase">
+                  <ImageIcon className="w-3 h-3" /> Custom Avatar
+                </label>
+                <div className="flex flex-col gap-3">
+                  {settings.customAvatarUrl && (
+                    <div className="w-24 h-24 rounded-full overflow-hidden border border-white/20 mx-auto">
+                      <img src={settings.customAvatarUrl} alt="Custom Avatar Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  {settings.customAvatarUrl && (
+                    <button 
+                      onClick={() => onUpdate({ customAvatarUrl: null })}
+                      className="flex items-center justify-center gap-2 p-2 bg-red-600/40 border border-red-500/20 rounded hover:bg-red-600/60 transition-colors text-white text-sm mono mx-auto w-fit"
+                      title="Remove Custom Avatar"
+                    >
+                      <Trash2 className="w-4 h-4" /> Remove Avatar
+                    </button>
+                  )}
+                  <label htmlFor="avatar-upload" className="cursor-pointer flex items-center justify-center gap-2 p-2 bg-black/40 border border-white/10 rounded hover:bg-white/10 transition-colors text-white text-sm mono">
+                    <Upload className="w-4 h-4" /> Upload Image
+                  </label>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                </div>
+                <p className="text-[9px] text-slate-500 mono leading-relaxed mt-2">
+                  Replace Lexy's default eye with your own custom avatar image. Max 1MB.
                 </p>
               </div>
 

@@ -16,7 +16,8 @@ const DEFAULT_SETTINGS: LexySettings = {
   avatarSpeed: 1.2,
   coreIntensity: 1.1,
   userName: 'Ryan Korir',
-  memoryNodes: []
+  memoryNodes: [],
+  customAvatarUrl: null, // Default to no custom avatar
 };
 
 interface IWindow extends Window {
@@ -202,6 +203,7 @@ const App: React.FC = () => {
               speed={settings.avatarSpeed} 
               intensity={settings.coreIntensity} 
               onClick={toggleListening}
+              customAvatarUrl={settings.customAvatarUrl} // Pass the new prop
             />
           </div>
           
